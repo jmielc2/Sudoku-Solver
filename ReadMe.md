@@ -5,6 +5,7 @@ This is a program that solves a sudoku puzzle using the dancing links algorithm.
 ## References
 
 - Dancing Links - Donald Knuth
+- https://www.ocf.berkeley.edu/~jchu/publicportal/sudoku/sudoku.paper.html#Abstract
 - https://shivankaul.com/blog/sudoku
 
-All papers can be found in the `docs` folder.
+Donald Knuth's paper can be found in the `docs` folder.
