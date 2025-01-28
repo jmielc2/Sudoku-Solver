@@ -6,6 +6,8 @@
 namespace sdku {
     class AlgorithmX {
     private:
+        SudokuPuzzle puzzle;
+
         void reset();
     public:
         AlgorithmX();

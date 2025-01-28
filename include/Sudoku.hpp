@@ -4,27 +4,28 @@
 #include <utility>
 #include <cstdint>
 #include <string>
-#include <ostream>
 
 namespace sdku {
-    using puzzle_t = std::vector<std::pair<int, std::int_least8_t>>;
+    using puzzle_data_t = std::vector<std::pair<int, std::int_least8_t>>;
 
     class SudokuPuzzle {
     private:
-        puzzle_t puzzle_data;
+        puzzle_data_t puzzle_data;
+
+        puzzle_data_t generatePuzzleData(const std::string& puzzle) const;
     public:
-        SudokuPuzzle() = default;
         explicit SudokuPuzzle(const std::string& puzzle);
-        explicit SudokuPuzzle(const puzzle_t& puzzle);
+        explicit SudokuPuzzle(const puzzle_data_t& puzzle);
     };
 
     class SudokuSolution {
     private:
         std::string solution;
 
-        std::string generatePuzzle() const;
+        std::string generateBoard(const SudokuPuzzle& puzzle, const puzzle_data_t& solution) const;
     public:
-        SudokuSolution(const SudokuPuzzle& puzzle, const puzzle_t& solution);
-        friend std::ostream& operator<<(std::ostream& out, const SudokuSolution& solution);
+        SudokuSolution(const SudokuPuzzle& puzzle, const puzzle_data_t& solution);
+
+        inline const std::string& board() const { return solution; }
     };
 }

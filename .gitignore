@@ -1,6 +1,7 @@
 # Build artifacts
 build/
 bin/
+.vscode/
 *.o
 *.a
 *.so

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.5)
 
 project(Sudoku-Solver)
 
@@ -8,9 +8,18 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_executable(main)
 
-add_compile_options(main PRIVATE
-    -Wall -Wextra -Werror -Weffc++ -Wconversion -Wsign-conversion -Wpedantic -ggdb -DNDEBUG
+add_compile_options(
+    -Wall -Wextra -Werror -Wshadow -Wnon-virtual-dtor -Wpedantic -Weffc++
+    -Wold-style-cast -Wconversion -Wsign-conversion -Wlifetime -Wformat=2
+    -Wcast-align -Woverloaded-virtual -Wnull-dereference -Wdouble-promotion
+    -Wnrvo
 )
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_compile_options(-ggdb)
+else()
+    add_compile_options(-O2 -DNDEBUG)
+endif()
 
 target_sources(main PRIVATE
     src/main.cpp
