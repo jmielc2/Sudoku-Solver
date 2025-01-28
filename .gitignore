@@ -1,0 +1,36 @@
+# Build artifacts
+build/
+bin/
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+*.ilk
+*.pdb
+*.lib
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+*.cmake
+cmake_install.cmake
+
+# IDE-specific files
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.suo
+*.user
+*.ncb
+*.sdf
+*.opensdf
+
+# Editor-specific files
+*.swproj
+*.xcodeproj
+
+# System-specific files
+.DS_Store
+Thumbs.db
