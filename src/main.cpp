@@ -1,7 +1,6 @@
 #include <print>
 
 #include "AlgorithmX.hpp"
-#include "Sudoku.hpp"
 
 int main() {
     sdku::SudokuPuzzle puzzle{""};
