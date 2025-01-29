@@ -1,6 +1,6 @@
 ## Sudoku Solver
 
-This is a program that solves a sudoku puzzle using the dancing links algorithm. The dancing links algorithm is an algrithm designed for solving exact coverage problems.
+This is a program that solves a sudoku puzzle using the dancing links algorithm. The dancing links algorithm is an optimized implementation AlgorithmX designed for solving exact coverage problems quickly.
 
 ## References
 

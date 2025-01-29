@@ -6,7 +6,8 @@
 #include <string>
 
 namespace sdku {
-    using puzzle_data_t = std::vector<std::pair<int, std::int_least8_t>>;
+    using puzzle_data_t =
+        std::vector<std::pair<std::pair<int, int>, std::uint_least8_t>>;
 
     class SudokuPuzzle {
     private:

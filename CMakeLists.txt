@@ -12,7 +12,6 @@ add_compile_options(
     -Wall -Wextra -Werror -Wshadow -Wnon-virtual-dtor -Wpedantic -Weffc++
     -Wold-style-cast -Wconversion -Wsign-conversion -Wlifetime -Wformat=2
     -Wcast-align -Woverloaded-virtual -Wnull-dereference -Wdouble-promotion
-    -Wnrvo
 )
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -24,10 +23,10 @@ endif()
 target_sources(main PRIVATE
     src/main.cpp
     src/Sudoku.cpp
-    src/AlgorithmX.cpp
 )
 
 target_include_directories(main PRIVATE ${CMAKE_SOURCE_DIR}/include)
+target_include_directories(main PRIVATE ${CMAKE_SOURCE_DIR}/src)
 if (${CMAKE_CXX_COMPILER} STREQUAL "/usr/bin/clang")
     target_link_libraries(main PRIVATE c++)
 endif()

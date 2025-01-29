@@ -5,7 +5,7 @@
 
 int main() {
     sdku::SudokuPuzzle puzzle{""};
-    sdku::AlgorithmX solver{puzzle};
+    sdku::AlgorithmX<4> solver{puzzle};
     const std::vector<sdku::SudokuSolution> solutions = solver.solve();
 
     switch(solutions.size()) {
