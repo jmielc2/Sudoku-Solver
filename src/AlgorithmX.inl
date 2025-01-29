@@ -2,7 +2,9 @@
 
 #include "AlgorithmX.hpp"
 
+#ifndef NDEBUG
 #include <iostream>
+#endif
 
 namespace sdku {
     template<size_t D>
@@ -73,7 +75,7 @@ namespace sdku {
             row_start = row_end + 1;
         }
 
-        // Testing setup
+#ifndef NDEBUG
         Node* node = &head_node;
         node = &nodes.at(node->right);
         while (node != &head_node) {
@@ -110,6 +112,7 @@ namespace sdku {
             }
         }
         std::cout << "Rows loop right and left!\n";
+#endif
     }
 
     template<size_t D>

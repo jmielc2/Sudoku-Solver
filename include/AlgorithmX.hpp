@@ -23,8 +23,8 @@ namespace sdku {
             size_t right = 0;
             size_t constraint = 0;
             union {
-                Option option{{0, 0}, 0};
-                size_t count;
+                Option option;
+                size_t count{0};
             };
         };
 
