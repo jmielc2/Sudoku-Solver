@@ -6,67 +6,83 @@
 
 namespace sdku {
     template<size_t D>
-    void AlgorithmX<D>::Node::remove(std::vector<Node>& nodes) {
-        nodes.at(left).right = right;
-        nodes.at(right).left = left;
+    constexpr Position_t AlgorithmX<D>::indexToPosition(const size_t index) const {
+        const size_t y = index / D;
+        return Position_t{index - (y * D), y};
     }
 
     template<size_t D>
-    void AlgorithmX<D>::Node::undo(std::vector<Node>& nodes) {
-        nodes.at(left).right = self;
-        nodes.at(right).left = self;
-    }
+    template<class UnaryFunction>
+    void AlgorithmX<D>::configConstraintNode(const Constraint_t constraint, const size_t row_start, const size_t y, const Option_t option, UnaryFunction constraint_eval) {
+        const size_t i = row_start + std::to_underlying(constraint);
+        const size_t cell_constraint = constraint_eval(constraint);
+        Node& node = nodes.at(i);
+        Node& constraint_node = nodes.at(cell_constraint);
 
-    template<size_t D>
-    inline constexpr size_t AlgorithmX<D>::head() const { return num_nodes - 1; }
+        node.self = i;
+        if (constraint == Constraint_t::CELL) [[unlikely]] {
+            node.left = i + 3;
+        } else {
+            node.left = i - 1;
+        }
+        if (constraint == Constraint_t::BOX) [[unlikely]] {
+            node.right = i - 3;
+        } else {
+            node.right = i + 1;
+        }
+        node.down = cell_constraint;
+        node.up = constraint_node.up;
+        node.option = option;
 
-    template<size_t D>
-    inline constexpr std::pair<size_t, size_t> AlgorithmX<D>::indexToPosition(size_t index) const {
-        return {0, 0};
+        constraint_node.count++;
+        constraint_node.up = node.self;
+        if (y == 1) [[unlikely]] {
+            constraint_node.down = node.self;
+        } else {
+            nodes.at(node.up).down = node.self;
+        }
     }
 
     template<size_t D>
     void AlgorithmX<D>::reset() {
+        // Setup head node
         Node& head_node = nodes.at(head());
         head_node.left = dlx_dim_x - 1;
         head_node.right = 0;
-
-        // Setup nodes
-        size_t row_start = dlx_dim_x;
-        for (size_t y = 1; y < dlx_dim_y; y++) {
-            for (size_t x = 0; x < dlx_dim_x; x++) {
-                const size_t i = x + row_start;
-                Node& node = nodes.at(i);
-                node.left = i - 1;
-                node.right = i + 1;
-                node.down = i + dlx_dim_x;
-                node.up = i - dlx_dim_x;
-                node.self = i;
-                node.constraint = x;
-                node.option = {};  // TODO: based on current row, what is the option?
-            }
-            const size_t row_end = row_start + dlx_dim_x - 1;
-            Node& start_node = nodes.at(row_start);
-            Node& end_node = nodes.at(row_end);
-            start_node.left = row_end;
-            end_node.right = row_start;
-            row_start = row_end + 1;
-        }
 
         // Setup constraint nodes
         for (size_t col = 0; col < dlx_dim_x; col++) {
             Node& node = nodes.at(col);
             node.left = col - 1;
             node.right = col + 1;
-            node.down = col + dlx_dim_x;
-            node.up = col + (dlx_dim_x * (dlx_dim_y - 1));
-            node.self = col;
-            node.count = dlx_dim_y - 1;
-
-            nodes.at(node.up).down = col;
+            node.down = node.up = node.self = col;
+            node.count = 0;
         }
         nodes.at(0).left = head();
         nodes.at(dlx_dim_x - 1).right = head();
+
+        // Setup nodes
+        const size_t box_dim = std::sqrt(D);
+        for (size_t y = 0, row_start = dlx_dim_x; y < dlx_dim_y - 1; y++, row_start += 4) {
+            // Meta data used to determine the cell constraint
+            const size_t value = y / (D * D);
+            const size_t index = y % (D * D);
+            const auto position = indexToPosition(index);
+            const auto option = std::pair{position, value};
+
+            configConstraintNode(Constraint_t::CELL, row_start, y, option, [index](const Constraint_t) -> size_t {
+                return index; }
+            );
+            configConstraintNode(Constraint_t::ROW, row_start, y, option, [value, position](const Constraint_t) -> size_t {
+                return (D * D) + (D * value) + position.second;
+            });
+            configConstraintNode(Constraint_t::COL, row_start, y, option, [value, position](const Constraint_t) -> size_t {
+                return (D * D * 2) + (D * value) + position.first;
+            });
+            configConstraintNode(Constraint_t::BOX, row_start, y, option, [value, position, box_dim](const Constraint_t) -> size_t {
+                return (D * D * 3) + (D * value) + (position.second / box_dim) + (position.first / box_dim);
+            });
+        }
 
 #ifndef NDEBUG
         Node* node = &head_node;
@@ -110,19 +126,17 @@ namespace sdku {
 
     template<size_t D>
     AlgorithmX<D>::AlgorithmX() :
-      puzzle(puzzle_data_t{}),
-      nodes(num_nodes)
+      puzzle(PuzzleData_t{})
     {
         reset();
     }
 
     template<size_t D>
     AlgorithmX<D>::AlgorithmX(const SudokuPuzzle& puzzle) :
-      puzzle(puzzle),
-      nodes(num_nodes)
+      puzzle(puzzle)
     {
         setPuzzle(puzzle);
-#ifndef NDEBEG
+#ifndef NDEBUG
         std::println("Size of node - {} bytes", sizeof(Node));
         std::println("Num Node - {} nodes", num_nodes);
         std::println("Size of class - {} bytes\n", sizeof(AlgorithmX) + num_nodes * sizeof(Node));
@@ -146,4 +160,4 @@ namespace sdku {
         }
         return { };
     }
-}
+};

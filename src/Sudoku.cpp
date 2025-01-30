@@ -5,8 +5,8 @@ namespace sdku {
     * Sudoku Puzzle
     */
 
-    puzzle_data_t SudokuPuzzle::generatePuzzleData(const std::string& puzzle) const {
-        return puzzle_data_t{};
+    PuzzleData_t SudokuPuzzle::generatePuzzleData(const std::string& puzzle) const {
+        return PuzzleData_t{};
     }
 
     SudokuPuzzle::SudokuPuzzle(const std::string& puzzle) :
@@ -15,7 +15,7 @@ namespace sdku {
         return;
     }
 
-    SudokuPuzzle::SudokuPuzzle(const puzzle_data_t& puzzle) :
+    SudokuPuzzle::SudokuPuzzle(const PuzzleData_t& puzzle) :
       puzzle_data(puzzle)
     {
         return;
@@ -25,11 +25,11 @@ namespace sdku {
     * Sudoku Solution
     */
 
-    std::string SudokuSolution::generateBoard(const SudokuPuzzle& puzzle, const puzzle_data_t& solution) const {
+    std::string SudokuSolution::generateBoard(const SudokuPuzzle& puzzle, const PuzzleData_t& solution) const {
         return "Solution\n";
     }
 
-    SudokuSolution::SudokuSolution(const SudokuPuzzle& puzzle, const puzzle_data_t& solution) :
+    SudokuSolution::SudokuSolution(const SudokuPuzzle& puzzle, const PuzzleData_t& solution) :
       solution(generateBoard(puzzle, solution))
     {
         return;

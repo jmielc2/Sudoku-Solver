@@ -6,28 +6,30 @@
 #include <vector>
 
 namespace sdku {
-    using puzzle_data_t =
-        std::vector<std::pair<std::pair<size_t, size_t>, std::uint_least8_t>>;
+    using Position_t = std::pair<size_t, size_t>;
+    using Value_t = std::uint_least8_t;
+    using Option_t = std::pair<Position_t, Value_t>;
+    using PuzzleData_t = std::vector<Option_t>;
 
     class SudokuPuzzle {
     private:
-        puzzle_data_t puzzle_data;
+        PuzzleData_t puzzle_data;
 
-        puzzle_data_t generatePuzzleData(const std::string&) const;
+        PuzzleData_t generatePuzzleData(const std::string&) const;
     public:
         explicit SudokuPuzzle(const std::string&);
-        explicit SudokuPuzzle(const puzzle_data_t&);
+        explicit SudokuPuzzle(const PuzzleData_t&);
 
-        inline const puzzle_data_t& puzzleData() const { return puzzle_data; };
+        inline const PuzzleData_t& puzzleData() const { return puzzle_data; };
     };
 
     class SudokuSolution {
     private:
         std::string solution;
 
-        std::string generateBoard(const SudokuPuzzle&, const puzzle_data_t&) const;
+        std::string generateBoard(const SudokuPuzzle&, const PuzzleData_t&) const;
     public:
-        SudokuSolution(const SudokuPuzzle&, const puzzle_data_t&);
+        SudokuSolution(const SudokuPuzzle&, const PuzzleData_t&);
 
         inline const std::string& board() const { return solution; }
     };

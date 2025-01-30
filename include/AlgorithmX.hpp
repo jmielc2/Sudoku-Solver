@@ -12,39 +12,44 @@ namespace sdku {
     class AlgorithmX {
     private:
         // Types
-        using Option =
-            std::pair<std::pair<size_t, size_t>, std::uint_least8_t>;
+        enum class Constraint_t : size_t {
+            CELL = 0,
+            ROW  = 1,
+            COL  = 2,
+            BOX  = 3
+        };
 
         struct Node {
-            size_t up = 0;
-            size_t down = 0;
             size_t left = 0;
             size_t right = 0;
+            size_t up = 0;
+            size_t down = 0;
             size_t self = 0;
             size_t constraint = 0;
             union {
-                Option option;
+                Option_t option;
                 size_t count{0};
             };
-
-            void remove(std::vector<Node>&);
-            void undo(std::vector<Node>&);
         };
 
-        static_assert(D > 0 && (D == 4 || D == 9));
+        static_assert(D > 0 && (D == 4 || D == 9 || D == 16));
+
+        // Constants
+        static constexpr size_t dlx_dim_x = D * D * 4;
+        static constexpr size_t dlx_dim_y = (D * D * D) + 1;
+        static constexpr size_t num_nodes = dlx_dim_x + ((dlx_dim_y - 1) * 4) + 1;
+
 
         // Members
         SudokuPuzzle puzzle;
-        std::vector<Node> nodes;
+        std::array<Node, num_nodes> nodes;
         bool puzzle_set = false;
 
-        static constexpr int dlx_dim_x = D * D * 4;
-        static constexpr int dlx_dim_y = (D * D * D) + 1;
-        static constexpr size_t num_nodes = dlx_dim_x * dlx_dim_y + 1;
-
         // Methods
-        inline constexpr size_t head() const;
-        constexpr std::pair<size_t, size_t> indexToPosition(size_t) const;  
+        inline constexpr size_t head() const { return num_nodes - 1; };
+        constexpr Position_t indexToPosition(const size_t) const;
+        template<class UnaryFunction>
+        void configConstraintNode(const Constraint_t, const size_t, const size_t, const Option_t, UnaryFunction);
         void reset();
     public:
         // Constructors
@@ -56,6 +61,6 @@ namespace sdku {
 
         std::vector<SudokuSolution> solve();
     };
-}
+};
 
 #include "AlgorithmX.inl"

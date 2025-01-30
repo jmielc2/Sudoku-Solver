@@ -3,24 +3,30 @@
 #include "AlgorithmX.hpp"
 
 int main() {
-    sdku::SudokuPuzzle puzzle{""};
-    sdku::AlgorithmX<4> solver{puzzle};
-    const std::vector<sdku::SudokuSolution> solutions = solver.solve();
+    try {
+        const size_t puzzle_dimension = 4;
+        sdku::SudokuPuzzle puzzle{"0030 0010 0001 3020"}; // Test puzzle (0s are empty cells)
+        sdku::AlgorithmX<puzzle_dimension> solver{puzzle};
+        const std::vector<sdku::SudokuSolution> solutions = solver.solve();
 
-    switch(solutions.size()) {
-    case 0:
-        std::println("No solutions found.\n");
-        break;
-    case 1:
-        std::println("1 Solution Found!\n");
-        std::println("{}", solutions[0].board());
-        break;
-    default:
-        std::println("{} Solutions Found!\n", solutions.size());
-        for (const auto& solution : solutions) {
-            std::println("{}", solution.board());
+        switch(solutions.size()) {
+        case 0:
+            std::println("No solutions found.\n");
+            break;
+        case 1:
+            std::println("1 Solution Found!\n");
+            std::println("{}", solutions[0].board());
+            break;
+        default:
+            std::println("{} Solutions Found!\n", solutions.size());
+            for (const auto& solution : solutions) {
+                std::println("{}", solution.board());
+            }
+            break;
         }
-        break;
+    } catch (const std::exception& e) {
+        std::println("An error occurred: {}", e.what());
+        return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
 }
