@@ -12,6 +12,7 @@ add_compile_options(
     -Wall -Wextra -Werror -Wshadow -Wnon-virtual-dtor -Wpedantic -Weffc++
     -Wold-style-cast -Wconversion -Wsign-conversion -Wlifetime -Wformat=2
     -Wcast-align -Woverloaded-virtual -Wnull-dereference -Wdouble-promotion
+    -Wunused-variable
 )
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")

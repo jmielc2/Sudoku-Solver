@@ -7,7 +7,7 @@
 int main() {
     try {
         const size_t puzzle_dimension = 4;
-        sdku::SudokuPuzzle puzzle{"0030 0010 0001 3020"}; // Test puzzle (0s are empty cells)
+        sdku::SudokuPuzzle puzzle{"0340 4002 1002 0210"}; // Test puzzle (0s are empty cells)
         sdku::AlgorithmX<puzzle_dimension> solver{puzzle};
         const std::vector<sdku::SudokuSolution> solutions = solver.solve();
 

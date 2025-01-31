@@ -60,7 +60,7 @@ namespace sdku {
         void reset();
         size_t chooseConstraint();
         void printBoard();
-        void solveHelper();
+        void solveHelper(const int);
     public:
         // Constructors
         AlgorithmX();

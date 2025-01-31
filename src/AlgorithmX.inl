@@ -47,7 +47,7 @@ namespace sdku {
 
     template<size_t D>
     void AlgorithmX<D>::removeConstraint(const size_t constraint) {
-        Node& constraint_node = nodes.at(constraint);
+        const Node& constraint_node = nodes.at(constraint);
         nodes.at(constraint_node.left).right = constraint_node.right;
         nodes.at(constraint_node.right).left = constraint_node.left;
 
@@ -130,7 +130,6 @@ namespace sdku {
         nodes.at(dlx_dim_x - 1).right = head();
 
         // Setup nodes
-        const size_t box_dim = std::sqrt(D);
         for (size_t y = 0, row_start = dlx_dim_x; y < dlx_dim_y - 1; y++, row_start += 4) {
             // Meta data used to determine the cell constraint
             const size_t value = (y / (D * D)) + 1;
@@ -171,9 +170,11 @@ namespace sdku {
     }
 
     template<size_t D>
-    void AlgorithmX<D>::solveHelper() {
+    void AlgorithmX<D>::solveHelper(const int level) {
+        std::println("Solve Level: {}", level);
         Node& head_node = nodes.at(head());
         if (head_node.right == head()) {
+            std::println("Solution found!");
             solution.push_back(SudokuSolution{puzzle, current_solution});
             return;
         }
@@ -194,10 +195,8 @@ namespace sdku {
                 removeConstraint(col_node->constraint);
                 col_node = &nodes.at(col_node->right);
             }
-            solveHelper();
-            if (solution.size() > 0) {
-                return;;
-            }
+            solveHelper(level + 1);
+            std::println("Backtracking to Level: {}", level);
             col_node = &nodes.at(row_node->left);
             while (col_node != row_node) {
                 addConstraint(col_node->constraint);
@@ -240,7 +239,7 @@ namespace sdku {
             std::println("No puzzle given!");
             return { };
         }
-        solveHelper();
+        solveHelper(0);
         return solution;
     }
 };

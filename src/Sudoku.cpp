@@ -7,11 +7,14 @@ namespace sdku {
 
     PuzzleData_t SudokuPuzzle::generatePuzzleData(const std::string& puzzle) const {
         return PuzzleData_t{
-            Option_t{{2, 0}, 3},
-            Option_t{{2, 1}, 1},
-            Option_t{{3, 2}, 1},
-            Option_t{{0, 3}, 3},
-            Option_t{{2, 3}, 2}
+            Option_t{{1, 0}, 3},
+            Option_t{{2, 0}, 4},
+            Option_t{{0, 1}, 4},
+            Option_t{{3, 1}, 2},
+            Option_t{{0, 2}, 1},
+            Option_t{{3, 2}, 3},
+            Option_t{{1, 3}, 2},
+            Option_t{{2, 3}, 1}
         };
     }
 
