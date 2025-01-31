@@ -1,10 +1,14 @@
+#pragma once
+
 #include "Sudoku.hpp"
 
 #include <string>
 #include <algorithm>
+#include <fstream>
+#include <variant>
 
 namespace sdku {
-    inline std::string createEmptyBoard(const size_t D) {
+    std::string createEmptyBoard(const size_t D) {
         const size_t sqrt_d = std::sqrt(D);
         const size_t box_dim = sqrt_d + 1;
         const size_t x_dim = box_dim * sqrt_d;
@@ -34,7 +38,7 @@ namespace sdku {
         return board;
     }
 
-    static inline void fillBoard(const size_t D, std::string& board, const PuzzleData_t& puzzle) {
+    inline void fillBoard(const size_t D, std::string& board, const PuzzleData_t& puzzle) {
         const size_t sqrt_d = std::sqrt(D);
         const size_t box_dim = sqrt_d + 1;
         const size_t x_dim = box_dim * sqrt_d;
@@ -57,5 +61,34 @@ namespace sdku {
             fillBoard(D, board, data);
         }
         return board;
+    }
+
+    std::string readFile(const std::string& filename) {
+        std::ifstream file(filename, std::ios::in | std::ios::ate);
+        if (!file.is_open()) {
+            throw std::runtime_error("Could not open file: " + filename);
+        }
+        size_t length = file.tellg();
+        std::string content(length, '\0');
+        file.seekg(0);
+        file.read(content.data(), length);
+        return content;
+    }
+
+    std::string filterContent(const std::string& content) {
+        std::string filtered_content;
+        for (char c : content) {
+            if (std::isdigit(c)) {
+                filtered_content.push_back(c);
+            } else if (!std::isspace(c)) {
+                throw std::runtime_error("Invalid character in puzzle file: " + std::to_string(c));
+            }
+        }
+        return filtered_content;
+    }
+
+    SudokuPuzzle<9> readPuzzleFile(const std::string& filename) {
+        std::string filtered_content = filterContent(readFile(filename));
+        return SudokuPuzzle<9>(filtered_content);
     }
 }

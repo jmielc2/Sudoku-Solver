@@ -11,16 +11,21 @@ namespace sdku {
 
     template<size_t D>
     PuzzleData_t SudokuPuzzle<D>::generatePuzzleData(const std::string& puzzle) const {
-        return PuzzleData_t{
-            Option_t{{1, 0}, 3},
-            Option_t{{2, 0}, 4},
-            Option_t{{0, 1}, 4},
-            Option_t{{3, 1}, 2},
-            Option_t{{0, 2}, 1},
-            Option_t{{3, 2}, 3},
-            Option_t{{1, 3}, 2},
-            Option_t{{2, 3}, 1}
+        PuzzleData_t puzzle_data;
+        size_t x = 0;
+        size_t y = 0;
+        for (const char& c : puzzle) {
+            size_t value  = c - '0';
+            if (value > 0 && value <= D) {
+                puzzle_data.push_back(Option_t{{x, y}, value});
+            }
+            x++;
+            if (x == D) [[unlikely]] {
+                x = 0;
+                y++;
+            }
         };
+        return puzzle_data;
     }
 
     template<size_t D>

@@ -1,19 +1,28 @@
 #include <print>
 #include <string>
+#include <chrono>
 
 #include "AlgorithmX.hpp"
+#include "util.hpp"
 
-
-int main() {
+int main(int argc, char* argv[]) {
     try {
         // Setup
-        const size_t puzzle_dimension = 4;
-        sdku::SudokuPuzzle<puzzle_dimension> puzzle{"0340 4002 1002 0210"}; // Test puzzle (0s are empty cells)
-        sdku::AlgorithmX solver{puzzle};
+        if (argc != 2) {
+            std::println("Usage: ./sudoku <filename>");
+            return EXIT_SUCCESS;
+        }
+        const std::string filename{argv[1]};
+        const auto puzzle = sdku::readPuzzleFile(filename);
+        std::println("Solving Puzzle:\n{}", puzzle.board());
 
         // Solve
-        std::println("Solving Puzzle:\n{}", puzzle.board());
+        sdku::AlgorithmX solver{puzzle};
+        const auto start = std::chrono::high_resolution_clock::now();
         const auto solutions = solver.solve();
+        const auto end = std::chrono::high_resolution_clock::now();
+        const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+        std::println("Solved in {}ms", duration.count());
 
         // Result
         switch(solutions.size()) {
@@ -21,11 +30,11 @@ int main() {
             std::println("No solutions found.\n");
             break;
         case 1:
-            std::println("1 Solution Found!\n");
+            std::println("1 solution found!\n");
             std::println("{}", solutions[0].board());
             break;
         default:
-            std::println("{} Solutions Found!\n", solutions.size());
+            std::println("{} solutions found!\n", solutions.size());
             for (const auto& solution : solutions) {
                 std::println("{}", solution.board());
             }
