@@ -50,8 +50,7 @@ namespace sdku {
         // Methods
         inline constexpr size_t head() const { return num_nodes - 1; };
         constexpr Position_t indexToPosition(const size_t) const;
-        template<class UnaryFunction>
-        void configConstraintNode(const Constraint_t, const size_t, const size_t, const Option_t, UnaryFunction);
+        void configConstraintNode(const Constraint_t, const size_t, const size_t, const Option_t&, size_t (AlgorithmX<D>::*)(const Option_t&));
         void removeConstraint(const size_t);
         void addConstraint(const size_t);
         size_t evalCellConstraint(const Option_t&);
