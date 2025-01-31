@@ -2,6 +2,8 @@
 
 #ifndef NDEBUG
 #include <print>
+#include <iostream>
+#include <string>
 #endif
 
 namespace sdku {
@@ -46,9 +48,6 @@ namespace sdku {
 
     template<size_t D>
     void AlgorithmX<D>::removeConstraint(const size_t constraint) {
-    #ifndef NDEBUG
-        std::println("Removing constraint: {}", constraint);
-    #endif
         Node& constraint_node = nodes.at(constraint);
         nodes.at(constraint_node.left).right = constraint_node.right;
         nodes.at(constraint_node.right).left = constraint_node.left;
@@ -73,7 +72,7 @@ namespace sdku {
         nodes.at(constraint_node.right).left = constraint;
 
         Node* col_node = &nodes.at(constraint_node.up);
-        while (col_node->self != &constraint_node) {
+        while (col_node != &constraint_node) {
             Node* row_node = &nodes.at(col_node->left);
             while (row_node != col_node) {
                 nodes.at(row_node->up).down = row_node->self;
@@ -86,24 +85,31 @@ namespace sdku {
     }
 
     template<size_t D>
-    size_t AlgorithmX<D>::evalCellConstraint(const Option_t hint) {
-        return hint.first.second * D + hint.first.first;
+    size_t AlgorithmX<D>::evalCellConstraint(const Option_t& hint) {
+        const Position_t& position = hint.first;
+        return position.second * D + position.first;
     }
 
     template<size_t D>
-    size_t AlgorithmX<D>::evalRowConstraint(const Option_t hint) {
-        return (D * D) + (D * (hint.second - 1)) + (hint.first.second);
+    size_t AlgorithmX<D>::evalRowConstraint(const Option_t& hint) {
+        const size_t& value = hint.second;
+        const Position_t& position = hint.first;
+        return (D * D) + (D * (value - 1)) + (position.second);
     }
 
     template<size_t D>
-    size_t AlgorithmX<D>::evalColConstraint(const Option_t hint) {
-        return (D * D * 2) + (D * (hint.second - 1)) + (hint.first.first);
+    size_t AlgorithmX<D>::evalColConstraint(const Option_t& hint) {
+        const size_t& value = hint.second;
+        const Position_t& position = hint.first;
+        return (D * D * 2) + (D * (value - 1)) + (position.first);
     }
 
     template<size_t D>
-    size_t AlgorithmX<D>::evalBoxConstraint(const Option_t hint) {
+    size_t AlgorithmX<D>::evalBoxConstraint(const Option_t& hint) {
         const size_t box_dim = std::sqrt(D);
-        return (D * D * 3) + (D * (hint.second - 1)) + ((hint.first.second + hint.first.first + 2) / box_dim);
+        const size_t& value = hint.second;
+        const Position_t& position = hint.first;
+        return (D * D * 3) + (D * (value - 1)) + ((position.second + position.first + 2) / box_dim);
     }
     
     template<size_t D>
@@ -128,14 +134,21 @@ namespace sdku {
         const size_t box_dim = std::sqrt(D);
         for (size_t y = 0, row_start = dlx_dim_x; y < dlx_dim_y - 1; y++, row_start += 4) {
             // Meta data used to determine the cell constraint
-            const size_t value = y / (D * D);
+            const size_t value = (y / (D * D)) + 1;
             const size_t index = y % (D * D);
             const auto position = indexToPosition(index);
             const auto option = std::pair{position, value};
 
+            #ifndef NDEBUG
+            std::println("{} : value = {}, index = {}, position = {}", y, value, index, position);
+            // if (index == 15) {
+            //     std::getchar();
+            // }
+            #endif
+
             configConstraintNode(Constraint_t::CELL, row_start, y, option, [index](const Constraint_t) -> size_t {
-                return index; }
-            );
+                return index;
+            });
             configConstraintNode(Constraint_t::ROW, row_start, y, option, [value, position](const Constraint_t) -> size_t {
                 return (D * D) + (D * (value - 1)) + position.second;
             });
@@ -146,45 +159,83 @@ namespace sdku {
                 return (D * D * 3) + (D * (value - 1)) + ((position.second + position.first + 2) / box_dim);
             });
         }
+        std::println("");
 
-#ifndef NDEBUG
-        Node* node = &head_node;
-        node = &nodes.at(node->right);
-        while (node != &head_node) {
-            node = &nodes.at(node->right);
+        Node* col_node = &nodes.at(nodes.at(head()).right);
+        for (size_t x = 0; x < dlx_dim_x + 1; x++) {
+            std::println("Constraint {}", col_node->self);
+            Node* row_node = &nodes.at(col_node->down);
+            while (row_node != col_node) {
+                std::println("  {}", row_node->option);
+                row_node = &nodes.at(row_node->down);
+            }
+            std::getchar();
+            col_node = &nodes.at(col_node->right);
         }
-        node = &nodes.at(node->left);
-        while (node != &head_node) {
-            node = &nodes.at(node->left);
-        }
-        std::println("Head loops left and right!");
+    }
 
-        for (int i = 0; i < dlx_dim_x; i++) {
-            Node* col = &nodes.at(i);
-            node = &nodes.at(col->down);
-            while (node != col) {
-                col = &nodes.at(col->down);
-            }
-            node = &nodes.at(col->up);
-            while (node != col) {
-                col = &nodes.at(col->up);
-            }
-        }
-        std::println("Columns loop up and down!");
+    template<size_t D>
+    size_t AlgorithmX<D>::chooseConstraint() {
+        return nodes.at(head()).right;
+    }
 
-        for (int i = 0; i < dlx_dim_y; i++) {
-            Node* row = &nodes.at(dlx_dim_x);
-            node = &nodes.at(row->right);
-            while (node != row) {
-                node = &nodes.at(node->right);
-            }
-            node = &nodes.at(row->left);
-            while (node != row) {
-                node = &nodes.at(node->left);
-            }
+    template<size_t D>
+    void AlgorithmX<D>::printBoard() {
+        const size_t length = D * (D + 1);
+        std::string board(length, 'X');
+        for (const auto& option : current_solution) {
+            const auto position = option.first;
+            const size_t index = position.second * (D + 1) + position.first;
+            board[index] = char(option.second + '0');
         }
-        std::println("Rows loop right and left!\n");
-#endif
+        for (const auto& hint : puzzle.puzzleData()) {
+            const auto& position = hint.first;
+            const size_t index = position.second * (D + 1) + position.first;
+            board[index] = char(hint.second + '0');
+        }
+        for (size_t i = 0; i < D; i++) {
+            board[i * (D + 1) + D] = '\n';
+        }
+        std::println("{}", board);
+    }
+
+    template<size_t D>
+    void AlgorithmX<D>::solveHelper() {
+        Node& head_node = nodes.at(head());
+        if (head_node.right == head()) {
+            solution.push_back(SudokuSolution{puzzle, current_solution});
+            return;
+        }
+        size_t constraint = chooseConstraint();
+        removeConstraint(constraint);
+        Node* row_node = &nodes.at(nodes.at(constraint).down);
+        while (row_node->self != constraint) {
+            current_solution.push_back(row_node->option);
+
+            #ifndef NDEBUG
+            std::println("Placing {} at {}", row_node->option.second, row_node->option.first);
+            printBoard();
+            std::getchar();
+            #endif
+
+            Node* col_node = &nodes.at(row_node->right);
+            while (col_node != row_node) {
+                removeConstraint(col_node->constraint);
+                col_node = &nodes.at(col_node->right);
+            }
+            solveHelper();
+            if (solution.size() > 0) {
+                return;;
+            }
+            col_node = &nodes.at(row_node->left);
+            while (col_node != row_node) {
+                addConstraint(col_node->constraint);
+                col_node = &nodes.at(col_node->left);
+            }
+            current_solution.pop_back();
+            row_node = &nodes.at(row_node->down);
+        }
+        addConstraint(constraint);
     }
 
     template<size_t D>
@@ -199,11 +250,6 @@ namespace sdku {
       puzzle(puzzle)
     {
         setPuzzle(puzzle);
-#ifndef NDEBUG
-        std::println("Size of node - {} bytes", sizeof(Node));
-        std::println("Num Node - {} nodes", num_nodes);
-        std::println("Size of class - {} bytes\n", sizeof(AlgorithmX) + num_nodes * sizeof(Node));
-#endif
     }
 
     template<size_t D>
@@ -214,9 +260,6 @@ namespace sdku {
             removeConstraint(evalRowConstraint(hint));
             removeConstraint(evalColConstraint(hint));
             removeConstraint(evalBoxConstraint(hint));
-        #ifndef NDEBUG
-            std::println("");
-        #endif
         }
         puzzle_set = true;
     }
@@ -227,6 +270,7 @@ namespace sdku {
             std::println("No puzzle given!");
             return { };
         }
-        return { };
+        solveHelper();
+        return solution;
     }
 };

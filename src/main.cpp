@@ -1,6 +1,8 @@
 #include <print>
+#include <string>
 
 #include "AlgorithmX.hpp"
+
 
 int main() {
     try {
