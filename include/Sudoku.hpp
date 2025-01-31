@@ -7,7 +7,7 @@
 
 namespace sdku {
     using Position_t = std::pair<size_t, size_t>;
-    using Value_t = std::uint_least8_t;
+    using Value_t = size_t;
     using Option_t = std::pair<Position_t, Value_t>;
     using PuzzleData_t = std::vector<Option_t>;
 
