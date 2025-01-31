@@ -2,6 +2,7 @@
 
 #include <print>
 #include <string>
+#include <vector>
 
 namespace sdku {
     template<size_t D>
@@ -44,6 +45,7 @@ namespace sdku {
 
     template<size_t D>
     void AlgorithmX<D>::removeConstraint(const size_t constraint) {
+        nodes.at(head()).count--;
         const Node& constraint_node = nodes.at(constraint);
         nodes.at(constraint_node.left).right = constraint_node.right;
         nodes.at(constraint_node.right).left = constraint_node.left;
@@ -63,6 +65,7 @@ namespace sdku {
 
     template<size_t D>
     void AlgorithmX<D>::addConstraint(const size_t constraint) {
+        nodes.at(head()).count++;
         Node& constraint_node = nodes.at(constraint);
         nodes.at(constraint_node.left).right = constraint;
         nodes.at(constraint_node.right).left = constraint;
@@ -114,6 +117,7 @@ namespace sdku {
         Node& head_node = nodes.at(head());
         head_node.left = dlx_dim_x - 1;
         head_node.right = 0;
+        head_node.count = dlx_dim_x;
 
         // Setup constraint nodes
         for (size_t col = 0; col < dlx_dim_x; col++) {
@@ -143,7 +147,19 @@ namespace sdku {
 
     template<size_t D>
     size_t AlgorithmX<D>::chooseConstraint() {
-        return nodes.at(head()).right;
+        Node* head_node = &nodes.at(head());
+        std::vector<Node*> sorted_nodes{};
+        sorted_nodes.reserve(head_node->count);
+        Node* col_node = &nodes.at(head_node->right);
+        while (col_node != head_node) {
+            sorted_nodes.push_back(col_node);
+            col_node = &nodes.at(col_node->right);
+        }
+
+        std::sort(sorted_nodes.begin(), sorted_nodes.end(), [](const auto& a, const auto& b) {
+            return a->count < b->count;
+        });
+        return sorted_nodes.front()->self;
     }
 
     template<size_t D>
@@ -188,7 +204,7 @@ namespace sdku {
             #ifndef NDEBUG
             std::println("Placing {} at {}", row_node->option.second, row_node->option.first);
             printBoard();
-            // std::getchar();
+            std::getchar();
             #endif
 
             Node* col_node = &nodes.at(row_node->right);

@@ -18,7 +18,7 @@ add_compile_options(
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_options(-ggdb)
 else()
-    add_compile_options(-O2 -DNDEBUG)
+    add_compile_options(-O3 -DNDEBUG)
 endif()
 
 target_sources(main PRIVATE
