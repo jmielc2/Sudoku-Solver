@@ -3,7 +3,6 @@
 #include "Sudoku.hpp"
 
 #include <vector>
-#include <cstdint>
 #include <utility>
 #include <cmath>
 
@@ -41,10 +40,10 @@ namespace sdku {
 
 
         // Members
-        SudokuPuzzle puzzle;
+        SudokuPuzzle<D> puzzle;
         std::array<Node, num_nodes> nodes;
         PuzzleData_t current_solution;
-        std::vector<SudokuSolution> solution;
+        std::vector<SudokuSolution<D>> solution;
         bool puzzle_set = false;
 
         // Methods
@@ -64,13 +63,12 @@ namespace sdku {
     public:
         // Constructors
         AlgorithmX();
-        explicit AlgorithmX(const SudokuPuzzle&);
+        explicit AlgorithmX(const SudokuPuzzle<D>&);
 
         // Methods
-        void setPuzzle(const SudokuPuzzle&);
-
-        std::vector<SudokuSolution> solve();
+        void setPuzzle(const SudokuPuzzle<D>&);
+        std::vector<SudokuSolution<D>> solve();
     };
-};
+}
 
-#include "AlgorithmX.inl"
+#include "AlgorithmX.tpp"

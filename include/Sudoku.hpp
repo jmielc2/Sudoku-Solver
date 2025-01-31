@@ -11,26 +11,31 @@ namespace sdku {
     using Option_t = std::pair<Position_t, Value_t>;
     using PuzzleData_t = std::vector<Option_t>;
 
+    template<size_t D = 9>
     class SudokuPuzzle {
     private:
         PuzzleData_t puzzle_data;
+        std::string puzzle;
 
         PuzzleData_t generatePuzzleData(const std::string&) const;
     public:
         explicit SudokuPuzzle(const std::string&);
         explicit SudokuPuzzle(const PuzzleData_t&);
 
+        inline const std::string& board() const { return puzzle; };
         inline const PuzzleData_t& puzzleData() const { return puzzle_data; };
     };
 
+    template<size_t D = 9>
     class SudokuSolution {
     private:
-        std::string solution;
+        const std::string solution;
 
-        std::string generateBoard(const SudokuPuzzle&, const PuzzleData_t&) const;
     public:
-        SudokuSolution(const SudokuPuzzle&, const PuzzleData_t&);
+        SudokuSolution(const PuzzleData_t&, const PuzzleData_t&);
 
         inline const std::string& board() const { return solution; }
     };
 }
+
+#include "Sudoku.tpp"

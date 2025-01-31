@@ -6,11 +6,16 @@
 
 int main() {
     try {
+        // Setup
         const size_t puzzle_dimension = 4;
-        sdku::SudokuPuzzle puzzle{"0340 4002 1002 0210"}; // Test puzzle (0s are empty cells)
-        sdku::AlgorithmX<puzzle_dimension> solver{puzzle};
-        const std::vector<sdku::SudokuSolution> solutions = solver.solve();
+        sdku::SudokuPuzzle<puzzle_dimension> puzzle{"0340 4002 1002 0210"}; // Test puzzle (0s are empty cells)
+        sdku::AlgorithmX solver{puzzle};
 
+        // Solve
+        std::println("Solving Puzzle:\n{}", puzzle.board());
+        const auto solutions = solver.solve();
+
+        // Result
         switch(solutions.size()) {
         case 0:
             std::println("No solutions found.\n");

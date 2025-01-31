@@ -23,7 +23,6 @@ endif()
 
 target_sources(main PRIVATE
     src/main.cpp
-    src/Sudoku.cpp
 )
 
 target_include_directories(main PRIVATE ${CMAKE_SOURCE_DIR}/include)
