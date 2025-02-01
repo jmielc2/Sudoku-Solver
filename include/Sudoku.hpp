@@ -1,15 +1,13 @@
 #pragma once
 
+#include "util.hpp"
+
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <variant>
 
 namespace sdku {
-    using Position_t = std::pair<size_t, size_t>;
-    using Value_t = size_t;
-    using Option_t = std::pair<Position_t, Value_t>;
-    using PuzzleData_t = std::vector<Option_t>;
-
     template<size_t D = 9>
     class SudokuPuzzle {
     private:
@@ -35,6 +33,11 @@ namespace sdku {
 
         inline const std::string& board() const { return solution; }
     };
+
+    template<class... T>
+    inline std::string generateBoard(const size_t D, const T&... puzzle);
+
+    std::variant<SudokuPuzzle<4>, SudokuPuzzle<9>, SudokuPuzzle<16>> readPuzzleFile(const std::string& filename);
 }
 
 #include "Sudoku.tpp"

@@ -162,6 +162,7 @@ namespace sdku {
         return sorted_nodes.front()->self;
     }
 
+    #ifndef NDEBUG
     template<size_t D>
     void AlgorithmX<D>::printBoard() {
         const size_t length = D * (D + 1);
@@ -181,6 +182,7 @@ namespace sdku {
         }
         std::println("{}", board);
     }
+    #endif
 
     template<size_t D>
     void AlgorithmX<D>::solveHelper(const int level) {
