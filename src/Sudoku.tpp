@@ -11,16 +11,17 @@ namespace sdku {
 
     template<size_t D>
     PuzzleData_t SudokuPuzzle<D>::generatePuzzleData(const std::string& puzzle) const {
-        if (puzzle.size() != D * D) {
-            throw std::runtime_error("Given puzzle dimensions are invalid.");
-        }
-        PuzzleData_t puzzle_data;
+        PuzzleData_t puzzle_data{};
+        puzzle_data.reserve(puzzle.size());
         size_t x = 0;
         size_t y = 0;
-        for (const char& c : puzzle) {
-            size_t value  = c - '0';
-            if (value > 0 && value <= D) {
-                puzzle_data.push_back(Option_t{{x, y}, value});
+        for (const auto c : puzzle) {
+            Value_t value(c);
+            if (value > 0 && value <= D) [[unlikely]] {
+                puzzle_data.emplace_back(Option_t{{x, y}, value});
+            } else if (value > D) [[unlikely]] {
+              std::string message = std::format("Sudoku puzzle values must be between 0 and {}", D);
+              throw std::runtime_error(message);
             }
             x++;
             if (x == D) [[unlikely]] {

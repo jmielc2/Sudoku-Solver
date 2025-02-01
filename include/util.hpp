@@ -50,7 +50,12 @@ namespace sdku {
             const size_t y = box_y + position.second;
             const size_t x = box_x + position.first;
             const size_t index = y * x_dim + x;
-            board[index] = char(option.second + '0');
+            const Value_t value = option.second;
+            if (value >= 10) [[unlikely]] {
+                board[index] = char(option.second + 'A' - 10);
+            } else {
+                board[index] = char(option.second + '0');
+            }
         }
     }
 
@@ -77,9 +82,11 @@ namespace sdku {
 
     std::string filterContent(const std::string& content) {
         std::string filtered_content;
-        for (char c : content) {
+        for (const auto c : content) {
             if (std::isdigit(c)) {
-                filtered_content.push_back(c);
+                filtered_content.push_back(c - '0');
+            } else if (std::isupper(c) && c - 'A' + 10 <= 16) {
+                filtered_content.push_back(c - 'A' + 10);
             } else if (!std::isspace(c)) {
                 throw std::runtime_error("Invalid character in puzzle file: " + std::to_string(c));
             }
@@ -87,8 +94,17 @@ namespace sdku {
         return filtered_content;
     }
 
-    SudokuPuzzle<9> readPuzzleFile(const std::string& filename) {
+    std::variant<SudokuPuzzle<4>, SudokuPuzzle<9>, SudokuPuzzle<16>> readPuzzleFile(const std::string& filename) {
         std::string filtered_content = filterContent(readFile(filename));
-        return SudokuPuzzle<9>(filtered_content);
+        switch (filtered_content.size()) {
+        case 16:
+            return SudokuPuzzle<4>(filtered_content);
+        case 81:
+            return SudokuPuzzle<9>(filtered_content);
+        case 256:
+            return SudokuPuzzle<16>(filtered_content);
+        default:
+            throw std::runtime_error("Invalid puzzle dimensions.");
+        }
     }
 }
