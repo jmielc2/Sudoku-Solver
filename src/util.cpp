@@ -23,7 +23,6 @@ namespace sdku {
                 board[y * x_dim + x] = col;
             }
         }
-
         for (size_t y = 0; y < y_dim; y++) {
             board[y * x_dim + x_dim - 1] = '\n';
         }

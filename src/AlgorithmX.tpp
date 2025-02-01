@@ -91,14 +91,14 @@ namespace sdku {
 
     template<size_t D>
     size_t AlgorithmX<D>::evalRowConstraint(const Option_t& hint) {
-        const size_t& value = hint.second;
+        const Value_t& value = hint.second;
         const Position_t& position = hint.first;
         return (D * D) + (D * (value - 1)) + (position.second);
     }
 
     template<size_t D>
     size_t AlgorithmX<D>::evalColConstraint(const Option_t& hint) {
-        const size_t& value = hint.second;
+        const Value_t& value = hint.second;
         const Position_t& position = hint.first;
         return (D * D * 2) + (D * (value - 1)) + (position.first);
     }
@@ -106,7 +106,7 @@ namespace sdku {
     template<size_t D>
     size_t AlgorithmX<D>::evalBoxConstraint(const Option_t& hint) {
         const size_t box_dim = std::sqrt(D);
-        const size_t& value = hint.second;
+        const Value_t& value = hint.second;
         const Position_t& position = hint.first;
         return (D * D * 3) + (D * (value - 1)) + (position.second / box_dim) * box_dim + (position.first / box_dim);
     }
@@ -133,7 +133,7 @@ namespace sdku {
         // Setup nodes
         for (size_t y = 0, row_start = dlx_dim_x; y < dlx_dim_y - 1; y++, row_start += 4) {
             // Meta data used to determine the cell constraint
-            const size_t value = (y / (D * D)) + 1;
+            const Value_t value = (y / (D * D)) + 1;
             const size_t index = y % (D * D);
             const auto position = indexToPosition(index);
             const auto option = std::pair{position, value};
@@ -236,10 +236,9 @@ namespace sdku {
 
     template<size_t D>
     AlgorithmX<D>::AlgorithmX(const SudokuPuzzle<D>& puzzle) :
-      puzzle(puzzle)
-    {
-        setPuzzle(puzzle);
-    }
+      puzzle(puzzle),
+      puzzle_set(true)
+    { }
 
     template<size_t D>
     void AlgorithmX<D>::setPuzzle(const SudokuPuzzle<D>& puzzle) {
